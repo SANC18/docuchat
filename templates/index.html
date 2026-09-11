@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuChat — RAG PDF Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>📄 DocuChat</h1>
+      <p>Ask questions about your uploaded PDFs — answers are grounded in retrieved passages.</p>
+    </header>
+
+    <section class="upload-box">
+      <input type="file" id="pdfInput" accept="application/pdf" />
+      <button id="uploadBtn">Upload &amp; Ingest PDF</button>
+      <span id="uploadStatus"></span>
+    </section>
+
+    <section class="chat-window" id="chatWindow"></section>
+
+    <form id="chatForm" class="chat-form">
+      <input type="text" id="questionInput" placeholder="Ask something about your document..." autocomplete="off" required />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

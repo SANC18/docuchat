@@ -1,0 +1,20 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Data & generated index (regenerate with `python -m src.ingest`)
+data/*.pdf
+vectorstore/*
+!vectorstore/.gitkeep
+
+# OS / editor cruft
+.DS_Store
+.vscode/
+.idea/
