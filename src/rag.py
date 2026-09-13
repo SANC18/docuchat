@@ -10,6 +10,7 @@ Given a user question:
 
 import os
 import anthropic
+import requests
 
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -65,6 +66,7 @@ Answer:"""
 
 
 def ask_claude(prompt: str) -> str:
+    """Generate an answer using the paid Anthropic API."""
     if not config.ANTHROPIC_API_KEY:
         raise RuntimeError(
             "ANTHROPIC_API_KEY is not set. Add it to your .env file (see .env.example)."
@@ -78,11 +80,49 @@ def ask_claude(prompt: str) -> str:
     return response.content[0].text
 
 
+def ask_ollama(prompt: str) -> str:
+    """Generate an answer using a free, locally-running model via Ollama.
+
+    Requires Ollama to be installed and running on the machine (ollama.com),
+    with the target model pulled first (e.g. `ollama pull llama3.2`).
+    """
+    url = f"{config.OLLAMA_BASE_URL}/api/generate"
+    try:
+        response = requests.post(
+            url,
+            json={"model": config.OLLAMA_MODEL, "prompt": prompt, "stream": False},
+            timeout=120,
+        )
+    except requests.exceptions.ConnectionError:
+        raise RuntimeError(
+            "Could not reach Ollama. Is it installed and running? "
+            "Start it with 'ollama serve' (or just open the Ollama app), "
+            f"and make sure the model is pulled: 'ollama pull {config.OLLAMA_MODEL}'."
+        )
+
+    if response.status_code != 200:
+        raise RuntimeError(f"Ollama returned an error ({response.status_code}): {response.text}")
+
+    return response.json().get("response", "").strip()
+
+
+def ask_llm(prompt: str) -> str:
+    """Dispatch to whichever LLM provider is configured (LLM_PROVIDER in .env)."""
+    if config.LLM_PROVIDER == "ollama":
+        return ask_ollama(prompt)
+    elif config.LLM_PROVIDER == "claude":
+        return ask_claude(prompt)
+    else:
+        raise RuntimeError(
+            f"Unknown LLM_PROVIDER '{config.LLM_PROVIDER}'. Use 'claude' or 'ollama' in your .env file."
+        )
+
+
 def answer_question(question: str):
     """End-to-end: retrieve -> prompt -> generate. Returns (answer, sources)."""
     chunks = retrieve_chunks(question)
     prompt = build_prompt(question, chunks)
-    answer = ask_claude(prompt)
+    answer = ask_llm(prompt)
 
     sources = [
         {

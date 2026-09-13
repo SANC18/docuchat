@@ -8,9 +8,16 @@ from dotenv import load_dotenv
 
 load_dotenv()  # reads variables from a local .env file, if present
 
-# --- API keys / model settings ---
+# --- LLM provider: "claude" (paid API) or "ollama" (free, runs on your own machine) ---
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "claude").lower()
+
+# --- Claude (Anthropic API) settings ---
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
+
+# --- Ollama (free, local) settings ---
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 # --- Embedding model (runs locally, no API key needed) ---
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "sentence-transformers/all-MiniLM-L6-v2")

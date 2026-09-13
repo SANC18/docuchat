@@ -41,12 +41,35 @@ This is the same core pattern behind most production "chat with your data" tools
 
 | Layer | Choice | Why |
 |---|---|---|
-| LLM | Claude (Anthropic API) | High-quality generation; you already hold Anthropic certifications |
+| LLM | Claude (Anthropic API) **or** Ollama (free, local) — switchable via config | Claude for quality; Ollama for a $0 setup with an open-source model |
 | Embeddings | `sentence-transformers/all-MiniLM-L6-v2` (local, free) | No API cost for embedding; runs on CPU |
 | Vector store | FAISS | Fast, simple, no external database needed |
 | Orchestration | LangChain | Standard tooling for loaders/splitters/vectorstores |
 | Backend | Flask | Lightweight REST API, matches your existing stack |
 | Deployment | Docker | Reproducible, one-command run |
+
+### Choosing an LLM provider
+
+Set `LLM_PROVIDER` in your `.env` file to either:
+
+- **`claude`** — uses the Anthropic API. Highest answer quality, but pay-as-you-go (requires an API key with billing set up).
+- **`ollama`** — uses a model running entirely on your own machine via [Ollama](https://ollama.com). Completely free and private, but needs Ollama installed locally and a bit more RAM/CPU; answer quality is lower than Claude, especially on nuanced questions.
+
+To use Ollama:
+```bash
+# 1. Install Ollama from https://ollama.com
+# 2. Pull a small model (a few GB download, one-time)
+ollama pull llama3.2
+
+# 3. Make sure Ollama is running (it usually starts automatically after install;
+#    otherwise run this in a separate terminal and leave it open)
+ollama serve
+
+# 4. In your .env file:
+LLM_PROVIDER=ollama
+OLLAMA_MODEL=llama3.2
+```
+No Anthropic API key or billing is needed in this mode.
 
 ## Project Structure
 
